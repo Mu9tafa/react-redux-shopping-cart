@@ -5,58 +5,73 @@ import Filter from "./components/Filter";
 
 class App extends Component {
    state = {
-      products: data.products,
-      size: "",
-      sort: "",
+      filters: {
+         size: "",
+         sort: "",
+      },
    };
-   sortProductsHandler = (e) => {
-      const sort = e.target.value;
-      this.setState((prevState) => ({
-         sort: sort,
-         products: prevState.products.sort((a, b) => {
-            if (sort === "lowest") {
-               if (a.price < b.price) {
-                  return -1;
-               } else if (a.price > b.price) {
-                  return 1;
-               } else {
-                  return 0;
-               }
-            } else if (sort === "highest") {
-               if (a.price > b.price) {
-                  return -1;
-               } else if (a.price < b.price) {
-                  return 1;
-               } else {
-                  return 0;
-               }
+   renderProducts = (products, filters) => {
+      let filteredProducts = products.filter((product) => {
+         if (filters.size === "") {
+            return product;
+         } else {
+            return product.availableSizes.includes(filters.size);
+         }
+      });
+
+      filteredProducts = this.sortProducts(filteredProducts, filters);
+
+      return filteredProducts;
+   };
+
+   sortProducts = (filteredProducts, filters) => {
+      return filteredProducts.sort((a, b) => {
+         if (filters.sort === "lowest") {
+            if (a.price < b.price) {
+               return -1;
+            } else if (a.price > b.price) {
+               return 1;
             } else {
-               if (a._id > b._id) {
-                  return -1;
-               } else if (a._id < b._id) {
-                  return 1;
-               } else {
-                  return 0;
-               }
+               return 0;
             }
-         }),
-      }));
+         } else if (filters.sort === "highest") {
+            if (a.price > b.price) {
+               return -1;
+            } else if (a.price < b.price) {
+               return 1;
+            } else {
+               return 0;
+            }
+         } else {
+            if (a._id > b._id) {
+               return -1;
+            } else if (a._id < b._id) {
+               return 1;
+            } else {
+               return 0;
+            }
+         }
+      });
    };
+
+   sortProductsHandler = (e) => {
+      this.setState({
+         filters: {
+            ...this.state.filters,
+            sort: e.target.value,
+         },
+      });
+   };
+
    filterProductsHandler = (e) => {
-      if (e.target.value === "") {
-         this.setState({
+      this.setState({
+         filters: {
+            ...this.state.filters,
             size: e.target.value,
-            products: data.products,
-         });
-      } else {
-         this.setState({
-            size: e.target.value,
-            products: data.products.filter((product) => {
-               return product.availableSizes.indexOf(e.target.value) >= 0;
-            }),
-         });
-      }
+         },
+      });
    };
+
    render() {
       return (
          <div className="grid-container">
@@ -67,13 +82,23 @@ class App extends Component {
                <div className="content">
                   <div className="main">
                      <Filter
-                        count={this.state.products.length}
-                        sort={this.state.sort}
-                        size={this.state.size}
+                        count={
+                           this.renderProducts(
+                              data.products,
+                              this.state.filters
+                           ).length
+                        }
+                        sort={this.state.filters.sort}
+                        size={this.state.filters.size}
                         sortProducts={this.sortProductsHandler}
                         filterProducts={this.filterProductsHandler}
                      />
-                     <Products products={this.state.products} />
+                     <Products
+                        products={this.renderProducts(
+                           data.products,
+                           this.state.filters
+                        )}
+                     />
                   </div>
                   <div className="sidebar">cart items</div>
                </div>
