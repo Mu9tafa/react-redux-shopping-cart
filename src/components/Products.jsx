@@ -9,13 +9,18 @@ class Products extends Component {
                {this.props.products.map((product) => (
                   <li key={product._id}>
                      <div className="product">
-                        <a href="/">
+                        <a href={"#" + product._id}>
                            <img src={product.image} alt={product.title} />
                            <p>{product.title}</p>
                         </a>
                         <div className="product-price">
                            <div>{formatCurrency(product.price)}</div>
-                           <button className="button primary">
+                           <button
+                              onClick={() => {
+                                 this.props.addToCart(product);
+                              }}
+                              className="button primary"
+                           >
                               Add to Cart
                            </button>
                         </div>
