@@ -2,14 +2,41 @@ import React, { Component } from "react";
 import Products from "./components/Products";
 import data from "./data.json";
 import Filter from "./components/Filter";
+import Cart from "./components/Cart";
 
 class App extends Component {
    state = {
+      products: data.products,
+      filteredProducts: [],
+      cartItems: [],
       filters: {
          size: "",
          sort: "",
       },
    };
+
+   addToCartHandler = (product) => {
+      const cartItems = JSON.parse(JSON.stringify(this.state.cartItems));
+      let alreadyInCart = false;
+      cartItems.forEach((item) => {
+         if (item._id === product._id) {
+            item.count++;
+            alreadyInCart = true;
+         }
+      });
+      if (!alreadyInCart) {
+         cartItems.push({ ...product, count: 1 });
+      }
+      this.setState({ cartItems });
+   };
+
+   removeFromCartHandler = (product) => {
+      const cartItems = JSON.parse(JSON.stringify(this.state.cartItems));
+      this.setState({
+         cartItems: cartItems.filter((item) => item._id !== product._id),
+      });
+   };
+
    renderProducts = (products, filters) => {
       let filteredProducts = products.filter((product) => {
          if (filters.size === "") {
@@ -21,7 +48,10 @@ class App extends Component {
 
       filteredProducts = this.sortProducts(filteredProducts, filters);
 
-      return filteredProducts;
+      // return filteredProducts;
+      this.setState({
+         filteredProducts,
+      });
    };
 
    sortProducts = (filteredProducts, filters) => {
@@ -54,22 +84,24 @@ class App extends Component {
       });
    };
 
-   sortProductsHandler = (e) => {
-      this.setState({
+   sortProductsHandler = async (e) => {
+      await this.setState({
          filters: {
             ...this.state.filters,
             sort: e.target.value,
          },
       });
+      this.renderProducts(this.state.products, this.state.filters);
    };
 
-   filterProductsHandler = (e) => {
-      this.setState({
+   filterProductsHandler = async (e) => {
+      await this.setState({
          filters: {
             ...this.state.filters,
             size: e.target.value,
          },
       });
+      this.renderProducts(this.state.products, this.state.filters);
    };
 
    render() {
@@ -83,10 +115,8 @@ class App extends Component {
                   <div className="main">
                      <Filter
                         count={
-                           this.renderProducts(
-                              data.products,
-                              this.state.filters
-                           ).length
+                           this.state.filteredProducts.length ||
+                           this.state.products.length
                         }
                         sort={this.state.filters.sort}
                         size={this.state.filters.size}
@@ -94,13 +124,20 @@ class App extends Component {
                         filterProducts={this.filterProductsHandler}
                      />
                      <Products
-                        products={this.renderProducts(
-                           data.products,
-                           this.state.filters
-                        )}
+                        addToCart={this.addToCartHandler}
+                        products={
+                           this.state.filteredProducts.length
+                              ? this.state.filteredProducts
+                              : this.state.products
+                        }
                      />
                   </div>
-                  <div className="sidebar">cart items</div>
+                  <div className="sidebar">
+                     <Cart
+                        cartItems={this.state.cartItems}
+                        removeFromCart={this.removeFromCartHandler}
+                     />
+                  </div>
                </div>
             </main>
             <footer>footer</footer>
