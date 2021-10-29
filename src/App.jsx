@@ -16,6 +16,11 @@ class App extends Component {
       },
    };
 
+   makingOrderHandler = (order) => {
+      // alert(order);
+      console.log(order);
+   };
+
    addToCartHandler = (product) => {
       // Clone
       const cartItems = JSON.parse(JSON.stringify(this.state.cartItems));
@@ -134,6 +139,7 @@ class App extends Component {
                   </div>
                   <div className="sidebar">
                      <Cart
+                        makingOrderHandler={this.makingOrderHandler}
                         cartItems={this.state.cartItems}
                         removeFromCart={this.removeFromCartHandler}
                      />

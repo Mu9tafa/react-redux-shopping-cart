@@ -3,8 +3,27 @@ import formatCurrency from "../util";
 
 export class Cart extends Component {
    state = {
-      showCheckout: false,
+      showCheckout: true,
+      name: "",
+      email: "",
+      address: "",
    };
+
+   inputHandler = (e) => {
+      this.setState({ [e.target.name]: e.target.value });
+   };
+
+   createOrderHandler = (e) => {
+      e.preventDefault();
+      const order = {
+         name: this.state.name,
+         email: this.state.email,
+         address: this.state.address,
+         cartItems: this.props.cartItems,
+      };
+      this.props.makingOrderHandler(order);
+   };
+
    render() {
       return (
          <div>
@@ -20,9 +39,9 @@ export class Cart extends Component {
             <div className="cart">
                <ul className="cart-items">
                   {this.props.cartItems.map((item) => (
-                     <li>
+                     <li key={item._id}>
                         <div>
-                           <img src={item.image}></img>
+                           <img src={item.image} alt={item._id}></img>
                         </div>
                         <div>
                            <div>{item.title}</div>
@@ -57,7 +76,9 @@ export class Cart extends Component {
                         </div>
                         <button
                            className="button primary"
-                           onClick={this.setState({ showCheckout: true })}
+                           onClick={() => {
+                              this.setState({ showCheckout: true });
+                           }}
                         >
                            Proceed
                         </button>
@@ -65,16 +86,42 @@ export class Cart extends Component {
                   </div>
                   {this.state.showCheckout && (
                      <div className="cart">
-                        <form onSubmit={this.createOrder}>
-                           <ul>
+                        <form onSubmit={this.createOrderHandler}>
+                           <ul className="form-container">
                               <li>
-                                 <label>
-                                    <input
-                                       type="email"
-                                       required
-                                       onChange={this.inputHandler}
-                                    />
-                                 </label>
+                                 <label>Email:</label>
+                                 <input
+                                    name="email"
+                                    type="email"
+                                    required
+                                    onChange={this.inputHandler}
+                                 />
+                              </li>
+                              <li>
+                                 <label>Name:</label>
+                                 <input
+                                    name="name"
+                                    type="text"
+                                    required
+                                    onChange={this.inputHandler}
+                                 />
+                              </li>
+                              <li>
+                                 <label>Address:</label>
+                                 <input
+                                    name="address"
+                                    type="text"
+                                    required
+                                    onChange={this.inputHandler}
+                                 />
+                              </li>
+                              <li>
+                                 <button
+                                    className="button primary"
+                                    type="submit"
+                                 >
+                                    Checkout
+                                 </button>
                               </li>
                            </ul>
                         </form>
