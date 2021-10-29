@@ -3,7 +3,7 @@ import formatCurrency from "../util";
 
 export class Cart extends Component {
    state = {
-      showCheckout: true,
+      showCheckout: false,
       name: "",
       email: "",
       address: "",
