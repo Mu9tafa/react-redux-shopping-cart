@@ -6,9 +6,10 @@ import Cart from "./components/Cart";
 
 class App extends Component {
    state = {
-      products: data.products,
-      filteredProducts: [],
-      cartItems: [],
+      filteredProducts: data.products,
+      cartItems: localStorage.getItem("cartItems")
+         ? JSON.parse(localStorage.getItem("cartItems"))
+         : [],
       filters: {
          size: "",
          sort: "",
@@ -16,8 +17,10 @@ class App extends Component {
    };
 
    addToCartHandler = (product) => {
+      // Clone
       const cartItems = JSON.parse(JSON.stringify(this.state.cartItems));
       let alreadyInCart = false;
+      // Edit
       cartItems.forEach((item) => {
          if (item._id === product._id) {
             item.count++;
@@ -27,14 +30,19 @@ class App extends Component {
       if (!alreadyInCart) {
          cartItems.push({ ...product, count: 1 });
       }
+      // setState
       this.setState({ cartItems });
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
    };
 
    removeFromCartHandler = (product) => {
-      const cartItems = JSON.parse(JSON.stringify(this.state.cartItems));
-      this.setState({
-         cartItems: cartItems.filter((item) => item._id !== product._id),
-      });
+      // Clone
+      let cartItems = JSON.parse(JSON.stringify(this.state.cartItems));
+      // Edit
+      cartItems = cartItems.filter((item) => item._id !== product._id);
+      // setState
+      this.setState({ cartItems });
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
    };
 
    renderProducts = (products, filters) => {
@@ -42,16 +50,11 @@ class App extends Component {
          if (filters.size === "") {
             return product;
          } else {
-            return product.availableSizes.includes(filters.size);
+            return product.availableSizes.includes(`${filters.size}`);
          }
       });
-
       filteredProducts = this.sortProducts(filteredProducts, filters);
-
-      // return filteredProducts;
-      this.setState({
-         filteredProducts,
-      });
+      this.setState({ filteredProducts });
    };
 
    sortProducts = (filteredProducts, filters) => {
@@ -84,24 +87,28 @@ class App extends Component {
       });
    };
 
-   sortProductsHandler = async (e) => {
-      await this.setState({
-         filters: {
-            ...this.state.filters,
-            sort: e.target.value,
-         },
+   sortProductsHandler = (e) => {
+      // Clone
+      let filters = JSON.parse(JSON.stringify(this.state.filters));
+      // Edit
+      filters = { ...filters, sort: e.target.value };
+      // setState
+      this.setState({
+         filters,
       });
-      this.renderProducts(this.state.products, this.state.filters);
+      this.renderProducts(data.products, filters);
    };
 
-   filterProductsHandler = async (e) => {
-      await this.setState({
-         filters: {
-            ...this.state.filters,
-            size: e.target.value,
-         },
+   filterProductsHandler = (e) => {
+      // Clone
+      let filters = JSON.parse(JSON.stringify(this.state.filters));
+      // Edit
+      filters = { ...filters, size: e.target.value };
+      // setState
+      this.setState({
+         filters,
       });
-      this.renderProducts(this.state.products, this.state.filters);
+      this.renderProducts(data.products, filters);
    };
 
    render() {
@@ -114,10 +121,7 @@ class App extends Component {
                <div className="content">
                   <div className="main">
                      <Filter
-                        count={
-                           this.state.filteredProducts.length ||
-                           this.state.products.length
-                        }
+                        count={this.state.filteredProducts.length}
                         sort={this.state.filters.sort}
                         size={this.state.filters.size}
                         sortProducts={this.sortProductsHandler}
@@ -125,11 +129,7 @@ class App extends Component {
                      />
                      <Products
                         addToCart={this.addToCartHandler}
-                        products={
-                           this.state.filteredProducts.length
-                              ? this.state.filteredProducts
-                              : this.state.products
-                        }
+                        products={this.state.filteredProducts}
                      />
                   </div>
                   <div className="sidebar">
