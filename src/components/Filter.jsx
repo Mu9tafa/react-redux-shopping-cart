@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { filterProducts } from "../actions/filterActions";
 
 class Filter extends Component {
    render() {
@@ -20,7 +22,11 @@ class Filter extends Component {
                Filter{" "}
                <select
                   value={this.props.size}
-                  onChange={this.props.filterProducts}
+                  onChange={(e) => {
+                     this.props.filterProducts(this.props.products, {
+                        size: e.target.value,
+                     });
+                  }}
                >
                   <option value="">ALL</option>
                   <option value="XS">XS</option>
@@ -36,4 +42,11 @@ class Filter extends Component {
    }
 }
 
-export default Filter;
+export default connect(
+   (state) => ({
+      products: state.products.items,
+      filteredProducts: state.filteredProducts.filteredProducts,
+      size: state.filteredProducts.size,
+   }),
+   { filterProducts }
+)(Filter);

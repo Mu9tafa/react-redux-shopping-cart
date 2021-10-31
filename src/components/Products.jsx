@@ -30,32 +30,37 @@ class Products extends Component {
                   <div>loading....</div>
                ) : (
                   <ul className="products">
-                     {this.props.products.map((product) => (
-                        <li key={product._id}>
-                           <div className="product">
-                              <a
-                                 href={"#" + product._id}
-                                 onClick={() => {
-                                    this.openModalHandler(product);
-                                 }}
-                              >
-                                 <img src={product.image} alt={product.title} />
-                                 <p>{product.title}</p>
-                              </a>
-                              <div className="product-price">
-                                 <div>{formatCurrency(product.price)}</div>
-                                 <button
+                     {(this.props.filteredProducts || this.props.products).map(
+                        (product) => (
+                           <li key={product._id}>
+                              <div className="product">
+                                 <a
+                                    href={"#" + product._id}
                                     onClick={() => {
-                                       this.props.addToCart(product);
+                                       this.openModalHandler(product);
                                     }}
-                                    className="button primary"
                                  >
-                                    Add to Cart
-                                 </button>
+                                    <img
+                                       src={product.image}
+                                       alt={product.title}
+                                    />
+                                    <p>{product.title}</p>
+                                 </a>
+                                 <div className="product-price">
+                                    <div>{formatCurrency(product.price)}</div>
+                                    <button
+                                       onClick={() => {
+                                          this.props.addToCart(product);
+                                       }}
+                                       className="button primary"
+                                    >
+                                       Add to Cart
+                                    </button>
+                                 </div>
                               </div>
-                           </div>
-                        </li>
-                     ))}
+                           </li>
+                        )
+                     )}
                   </ul>
                )}
             </Fade>
@@ -110,6 +115,12 @@ class Products extends Component {
    }
 }
 
-export default connect((state) => ({ products: state.products.items }), {
-   fetchProducts,
-})(Products);
+export default connect(
+   (state) => ({
+      products: state.products.items,
+      filteredProducts: state.filteredProducts.filteredProducts,
+   }),
+   {
+      fetchProducts,
+   }
+)(Products);

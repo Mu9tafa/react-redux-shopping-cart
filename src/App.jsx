@@ -56,7 +56,7 @@ class App extends Component {
          if (filters.size === "") {
             return product;
          } else {
-            return product.availableSizes.includes(`${filters.size}`);
+            return product.availableSizes.includes(filters.size);
          }
       });
       filteredProducts = this.sortProducts(filteredProducts, filters);
@@ -128,14 +128,14 @@ class App extends Component {
                   <div className="main">
                      <Filter
                         count={this.state.filteredProducts.length}
-                        sort={this.state.filters.sort}
-                        size={this.state.filters.size}
-                        sortProducts={this.sortProductsHandler}
-                        filterProducts={this.filterProductsHandler}
+                        // sort={this.state.filters.sort}
+                        // size={this.state.filters.size}
+                        // sortProducts={this.sortProductsHandler}
+                        // filterProducts={this.filterProductsHandler}
                      />
                      <Products
                         addToCart={this.addToCartHandler}
-                        products={this.state.filteredProducts}
+                        // products={this.state.filteredProducts}
                      />
                   </div>
                   <div className="sidebar">
